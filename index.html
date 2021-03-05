@@ -1,0 +1,62 @@
+<!DOCTYPE html> 
+<html>
+    <head> 
+        <meta charset="utf-8">
+        <title>3D PC</title>
+    </head> 
+    <body> 
+        <canvas id="canvas"></canvas>
+        <script src="node_modules/three/build/three.js"></script> 
+        <script type="module">
+            import { OBJLoader } from '/node_modules/three/examples/jsm/loaders/OBJLoader.js'
+            import { MTLLoader } from '/node_modules/three/examples/jsm/loaders/MTLLoader.js'
+            import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js'
+            
+            const scene = new THREE.Scene()
+            const canvas = document.querySelector('#canvas')
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+            const renderer = new THREE.WebGLRenderer({canvas})
+            const objLoader = new OBJLoader()
+            const mtlLoader = new MTLLoader()
+            const orbitControls = new OrbitControls(camera, canvas)
+            const mtlUrl = 'pc.mtl'
+
+            const color = 0xFFFFFF
+            const intensity = 1
+            const light = new THREE.DirectionalLight(color, intensity)
+            light.position.set(0, 100, 50);
+
+            renderer.setSize(window.innerWidth, window.innerHeight)
+            document.body.appendChild(renderer.domElement)
+            scene.add(light)
+            camera.position.z = 20
+            camera.position.y = 10
+            camera.position.x = 10
+            
+            mtlLoader.load(mtlUrl,
+                function(materials) {
+                    materials.preload()
+                    objLoader.setMaterials(materials)
+                }
+            )
+            
+            objLoader.load('pc.obj',
+                function (object) {
+                    scene.add(object)
+                    object.position.set(3, 0, 1)
+                    light.target = object
+                    scene.add(light.target)
+                    renderer.render(scene, camera)
+                },
+                function (xhr) {
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+                },
+                function (error) {
+                    console.log('An error happened')
+                }
+            )
+
+            orbitControls.update()
+        </script>
+    </body> 
+</html>

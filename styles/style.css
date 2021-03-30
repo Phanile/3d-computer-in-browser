@@ -1,0 +1,14 @@
+#switcher_left {
+	position: absolute;
+	display: block;
+	z-index: 100;
+	top: 50%;
+}
+
+#switcher_right {
+	position: absolute;
+	display: block;
+	z-index: 100;
+	top: 50%;
+	right: 0;
+}

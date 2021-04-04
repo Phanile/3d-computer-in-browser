@@ -15,6 +15,9 @@
             import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js'
             import { GUI } from '/node_modules/three/examples/jsm/libs/dat.gui.module.js'
 
+            let computerVectors = []
+            let currentVectorIndex = 0
+
             const scene = new THREE.Scene()
             const canvas = document.querySelector('#canvas')
             const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -40,10 +43,7 @@
                         var computer = comp
                         objLoader.load(computer.pathToModel,
                             function(object) {
-                                scene.add(object)
-                                renderer.render(scene, camera)
-                                console.log(object.position)
-                                console.log('computer added', computer.name)
+                                onComputerLoaded(object)
                             },
                             function (xhr) {
                                 console.log((xhr.loaded / xhr.total * 100 ) + '% loaded')
@@ -58,21 +58,69 @@
 
             const loadAllComputers = () => {
                 for (var computer of computers) {
-                    objLoader.load(computer.pathToModel,
-                        function(object) {
-                            scene.add(object)
-                        },
-                        function (xhr) {
-                            console.log((xhr.loaded / xhr.total * 100 ) + '% loaded')
-                        },
-                        function (error) {
-                            console.log('An error happened')
-                        }
-                    )
+                    if (computer.load) {
+                        var xPos = 0
+                        objLoader.load(computer.pathToModel,
+                            function(object) {
+                                onComputerLoaded(object)
+                                object.position.x = xPos
+                                xPos += 500
+                            },
+                            function (xhr) {
+                                console.log((xhr.loaded / xhr.total * 100 ) + '% loaded')
+                            },
+                            function (error) {
+                                console.log('An error happened')
+                            }
+                        )
+                    }
                 }
             }
-            loadComputer(2)
-            renderer.render(scene, camera)
+
+            const onComputerLoaded = (comp) => {
+                scene.add(comp)
+                renderer.render(scene, camera)
+                computerVectors.push(comp.position)
+                console.log('computer added', comp.name)
+                console.log(computerVectors)
+            }
+
+            function moveCameraToNextComputer() {
+                if (camera.position.x + 45 <= computerVectors[currentVectorIndex].x) {
+                    camera.position.x += 5
+                    requestAnimationFrame(moveCameraToNextComputer)
+                }
+                renderer.render(scene, camera)
+            }
+            
+            function moveCameraToPreviousComputer() {
+                if (camera.position.x + 45 >= computerVectors[currentVectorIndex].x) {
+                    camera.position.x -= 5
+                    requestAnimationFrame(moveCameraToPreviousComputer)
+                }
+                renderer.render(scene, camera)
+            }
+            
+            function onNextButtonClick() {
+                if (currentVectorIndex + 1 > computerVectors.length) {
+                    return
+                }
+                currentVectorIndex++
+                moveCameraToNextComputer()
+            }
+            
+            function onPreviousButtonClick() {
+                if (currentVectorIndex - 1 < 0) {
+                    return
+                }
+                currentVectorIndex--
+                moveCameraToPreviousComputer()
+            }
+
+            loadAllComputers()
+
+            switcher_right.onclick = onNextButtonClick
+            switcher_left.onclick = onPreviousButtonClick
 
             const gui = new GUI()
             const cam = gui.addFolder('Camera')

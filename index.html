@@ -26,15 +26,13 @@
             const objLoader = new OBJLoader()
 
             const dirLight = new THREE.DirectionalLight(0xffffff)
-            dirLight.position.set(0, 200, 100)
+            dirLight.position.set(0, 2000, 1000)
             scene.add(dirLight)
             
 
             renderer.setSize(window.innerWidth, window.innerHeight)
             document.body.appendChild(renderer.domElement)
-
-            const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshPhongMaterial({color: 0x999999, depthWrite: false}));
-			scene.add(groundMesh)
+            renderer.setClearColor(0x424242, 1);
             renderer.render(scene, camera)
             
             const loadComputer = (computerId) => {
@@ -81,8 +79,6 @@
                 scene.add(comp)
                 renderer.render(scene, camera)
                 computerVectors.push(comp.position)
-                console.log('computer added', comp.name)
-                console.log(computerVectors)
             }
 
             function moveCameraToNextComputer() {

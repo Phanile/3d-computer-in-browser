@@ -4,14 +4,14 @@ const computers = [
         'name' : 'Gaming Wind 5',
         'price' : 1500,
         'currency' : 'usd',
-        'pathToModel' : '',
+        'pathToModel' : 'objects/Case2/case2.obj',
         'specifications' : {
             'videocard' : 'gtx 2060',
             'proccesor' : 'ryzen 5 2600',
             'ram' : 16,
             'data' : 1000
         },
-        'load' : false
+        'load' : true
     },
     {
         'id' : 2,

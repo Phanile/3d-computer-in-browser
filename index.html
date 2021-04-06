@@ -25,14 +25,16 @@
             const renderer = new THREE.WebGLRenderer({canvas})
             const objLoader = new OBJLoader()
 
+            const textureloader = new THREE.TextureLoader()
+            const material = new THREE.MeshPhongMaterial({map: textureloader.load('objects/Case2/metallic-texture-107683.jpg')})
+
             const dirLight = new THREE.DirectionalLight(0xffffff)
             dirLight.position.set(0, 2000, 1000)
             scene.add(dirLight)
             
-
             renderer.setSize(window.innerWidth, window.innerHeight)
             document.body.appendChild(renderer.domElement)
-            renderer.setClearColor(0x424242, 1);
+            renderer.setClearColor(0x222222, 1);
             renderer.render(scene, camera)
             
             const loadComputer = (computerId) => {
@@ -60,6 +62,9 @@
                         var xPos = 0
                         objLoader.load(computer.pathToModel,
                             function(object) {
+                                object.traverse(function(node){
+                                    if (node.isMesh) node.material = material
+                                })
                                 onComputerLoaded(object)
                                 object.position.x = xPos
                                 xPos += 500
@@ -103,6 +108,8 @@
                 }
                 currentVectorIndex++
                 moveCameraToNextComputer()
+                addAllAnimations()
+                afterClickDelay(currentVectorIndex)
             }
             
             function onPreviousButtonClick() {
@@ -111,20 +118,104 @@
                 }
                 currentVectorIndex--
                 moveCameraToPreviousComputer()
+                addAllAnimations()
+                afterClickDelay(currentVectorIndex)
             }
 
+            const updateComputerInfo = (index) => {
+                document.getElementById('processor').innerHTML = `Model: ${computers[index].specifications.proccesor}`
+                document.getElementById('videocard').innerHTML = `Model: ${computers[index].specifications.videocard}`
+                document.getElementById('ram').innerHTML = `Volume: ${computers[index].specifications.ram}gb (2x8)`
+                document.getElementById('data').innerHTML = `Volume: ${computers[index].specifications.data}gb`
+                document.getElementById('name').innerHTML = `${computers[index].name}`
+            }
+
+            const clearAllAnimations = () => {
+                document.getElementsByClassName('anim')[0].classList.remove('anim')
+            }
+
+            const addAllAnimations = () => {
+                document.getElementsByClassName('content')[0].classList.add('anim')
+            }
+
+            const afterClickDelay = (index) => {
+                setTimeout(() => {
+                    updateComputerInfo(index)
+                }, 1250)
+                setTimeout(() => {
+                    clearAllAnimations()
+                }, 2500)
+            }
+            
             loadAllComputers()
+            updateComputerInfo(0)
 
             switcher_right.onclick = onNextButtonClick
             switcher_left.onclick = onPreviousButtonClick
 
-            const gui = new GUI()
-            const cam = gui.addFolder('Camera')
-            cam.add(camera.position, 'x', -1000, 1000).listen().onChange(function(value){camera.position.x = value; renderer.render(scene, camera)})
-            cam.add(camera.position, 'y', -1000, 1000).listen().onChange(function(value){camera.position.y = value; renderer.render(scene, camera)})
-            cam.add(camera.position, 'z', -1000, 1000).listen().onChange(function(value){camera.position.z = value; renderer.render(scene, camera)})
+            //const gui = new GUI()
+            //const cam = gui.addFolder('Camera')
+            //cam.add(camera.position, 'x', -1000, 1000).listen().onChange(function(value){camera.position.x = value; renderer.render(scene, camera)})
+            //cam.add(camera.position, 'y', -1000, 1000).listen().onChange(function(value){camera.position.y = value; renderer.render(scene, camera)})
+            //cam.add(camera.position, 'z', -1000, 1000).listen().onChange(function(value){camera.position.z = value; renderer.render(scene, camera)})
         </script>
     <button id="switcher_left">previous</button>
     <button id="switcher_right">next</button>
+    <div class="main">
+        <div class="content">
+            <div class="specs">
+                <h1 class="name" id="name">Gaming wind 5</h1>
+                <ul class="mainul">
+                    <li>
+                        Processor
+                        <ul>
+                            <li>Producer: AMD</li>
+                            <li id="processor">Model: Ryzen 5 2600</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Video graphics
+                        <ul>
+                            <li>Producer: Palit</li>
+                            <li>Family: GeForce</li>
+                            <li id="videocard">Model: RTX 2060</li>
+                            <li>Memory: 5gb</li>
+                        </ul>
+                    </li>
+                    <li>
+                        RAM
+                        <ul>
+                            <li>Producer: Corsair</li>
+                            <li>Type: DDR4</li>
+                            <li id="ram">Volume: 16gb (2x8gb)</li>
+                            <li>Frequency: 1999Hz</li>
+                        </ul>
+                    </li>
+                    <li>
+                        SSD
+                        <ul>
+                            <li>Producer: PavelCo</li>
+                            <li>Type: M2</li>
+                            <li id="data">Volume: 256gb</li>
+                            <li>Frequency: 25GHz</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- В блоке .view надо сделать показ системника. На него стилей нет пока -->
+
+            <div class="view">
+
+            </div>
+        </div>
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
     </body> 
 </html>
